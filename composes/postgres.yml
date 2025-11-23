@@ -1,0 +1,19 @@
+postgres:
+  image: postgres:17
+  security_opt:
+    - no-new-privileges:true
+  healthcheck:
+    test: ["CMD", "pg_isready", "-q", "-d", "${POSTGRES_DB}", "-U", "${POSTGRES_USER}"]
+    timeout: 60s
+    interval: 5s
+    retries: 3
+  env_file: configs/database.env
+  volumes:
+    - /apps/media/appdata/n8n/database:/var/lib/postgresql/data:rw
+  networks:
+    - default
+  deploy:
+    replicas: 1
+    labels:
+      - "sablier.enable=true"
+      - "sablier.group=n8n"

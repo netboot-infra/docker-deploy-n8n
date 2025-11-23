@@ -1,0 +1,5 @@
+networks:
+  home_net:
+    external: true
+
+services:

@@ -1,0 +1,38 @@
+webservice:
+  image: ghcr.io/netboot-infra/n8n:v1.121.2
+  env_file: configs/webservice.env
+  environment:
+    # Setting this environment variable will prevent n8n from sending telemetry to its servers.
+    - N8N_DIAGNOSTICS_ENABLED=false
+    # Prevents n8n from retrieving version information from its servers.
+    - N8N_VERSION_NOTIFICATIONS_ENABLED=false
+    # Disables the workflow templates in an n8n instance that are otherwise obtained from n8n servers.
+    - N8N_TEMPLATES_ENABLED=false
+    # Setting this variable to an empty value will prevent n8n from loading the default frontend hooks file from n8n servers 
+    - EXTERNAL_FRONTEND_HOOKS_URLS=
+    # Setting this variable to an empty value overrides the default telemetry configuration for the front end.
+    - N8N_DIAGNOSTICS_CONFIG_FRONTEND=
+    # Setting this variable to an empty value overrides the default server-side telemetry configuration.
+    - N8N_DIAGNOSTICS_CONFIG_BACKEND=
+    # This will prevent n8n from fetching onboarding prompts.
+    - N8N_ONBOARDING_FLOW_DISABLED=true
+  volumes:
+    - /apps/media/appdata/n8n/data:/home/node/.n8n:rw
+    - /apps/media/appdata/n8n/files:/files:rw
+  networks:
+    - default
+    - home_net
+  deploy:
+    replicas: 1
+    labels:
+      - "sablier.enable=true"
+      - "sablier.group=n8n"
+      - "traefik.enable=true"
+      - "traefik.swarm.lbswarm=true"
+      - "traefik.http.routers.n8n.rule=Host(`n8n.netboot.fr`)"
+      - "traefik.http.routers.n8n.entrypoints=https"
+      - "traefik.http.routers.n8n.middlewares=sablier-n8n@swarm"
+      - "traefik.http.services.n8n.loadbalancer.server.port=5678"
+      - "traefik.http.middlewares.sablier-n8n.plugin.sablier.group=n8n"
+      - "traefik.http.middlewares.sablier-n8n.plugin.sablier.dynamic.displayName=N8N Stack"
+      - "traefik.http.middlewares.sablier-n8n.plugin.sablier.sessionDuration=30m"
