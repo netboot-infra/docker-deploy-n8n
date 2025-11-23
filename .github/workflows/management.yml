@@ -7,7 +7,6 @@ on:
         type: choice
         description: Select the Docker stack operation you want to execute on the remote host
         options: 
-          - ls       # List all deployed stacks
           - ps       # Show running services for the stack
           - rm       # Remove the stack
           - services # List services in the stack
